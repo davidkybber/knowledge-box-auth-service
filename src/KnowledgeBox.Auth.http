@@ -1,0 +1,6 @@
+@KnowledgeBox.Auth_HostAddress = http://localhost:5225
+
+GET {{KnowledgeBox.Auth_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
