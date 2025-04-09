@@ -14,5 +14,6 @@ RUN dotnet publish "src/KnowledgeBox.Auth.csproj" -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-EXPOSE 80
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "KnowledgeBox.Auth.dll"] 

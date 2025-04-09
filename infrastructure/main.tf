@@ -48,16 +48,27 @@ resource "azurerm_container_app" "auth_service" {
 
       env {
         name  = "PORT"
-        value = "3000"
+        value = "8080"
       }
 
       # Add more environment variables as needed
     }
   }
 
+  secret {
+    name  = "acr-password"
+    value = var.acr_admin_enabled ? azurerm_container_registry.acr[0].admin_password : null
+  }
+
+  registry {
+    server   = "${var.acr_name}.azurecr.io"
+    username = var.acr_admin_enabled ? var.acr_name : null
+    password_secret_name = var.acr_admin_enabled ? "acr-password" : null
+  }
+
   ingress {
     external_enabled = true
-    target_port     = 3000
+    target_port     = 8080
     traffic_weight {
       percentage      = 100
       latest_revision = true
