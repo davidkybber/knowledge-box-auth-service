@@ -5,6 +5,7 @@ data "azurerm_resource_group" "rg" {
 
 # Azure Container Registry
 resource "azurerm_container_registry" "acr" {
+  count               = var.acr_enabled ? 1 : 0
   name                = var.acr_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
@@ -29,12 +30,16 @@ resource "azurerm_container_app" "auth_service" {
   revision_mode               = "Single"
   tags                        = var.tags
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   template {
     container {
       name   = "auth-service"
-      image  = "${azurerm_container_registry.acr.login_server}/${var.project_name}-auth-service:latest"
-      cpu    = 0.5
-      memory = "1Gi"
+      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
 
       env {
         name  = "NODE_ENV"
@@ -59,29 +64,17 @@ resource "azurerm_container_app" "auth_service" {
     }
     allow_insecure_connections = false
   }
-
-  registry {
-    server               = azurerm_container_registry.acr.login_server
-    username             = azurerm_container_registry.acr.admin_username
-    password_secret_name = "registry-password"
-  }
-
-  secret {
-    name  = "registry-password"
-    value = azurerm_container_registry.acr.admin_password
-  }
 }
 
-# Application Insights for monitoring
-resource "azurerm_application_insights" "appinsights" {
-  name                = "${var.project_name}-auth-insights"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  application_type    = "web"
-  tags                = var.tags
+# Grant ACR pull access to the Container App's managed identity
+resource "azurerm_role_assignment" "acr_pull" {
+  count                = var.acr_enabled ? 1 : 0
+  scope                = azurerm_container_registry.acr[0].id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_container_app.auth_service.identity[0].principal_id
 }
 
-# Key Vault for secrets management
+# Key Vault for secrets management (using free tier)
 resource "azurerm_key_vault" "kv" {
   name                = "${var.project_name}-auth-kv"
   location            = data.azurerm_resource_group.rg.location
@@ -114,16 +107,4 @@ resource "azurerm_key_vault_access_policy" "container_app_access" {
   secret_permissions = [
     "Get", "List"
   ]
-}
-
-# Associate access policies with Key Vault
-resource "azurerm_key_vault_policy_assignment" "kv_policy" {
-  key_vault_id = azurerm_key_vault.kv.id
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-    secret_permissions = [
-      "Get", "List", "Set", "Delete", "Purge"
-    ]
-  }
 } 

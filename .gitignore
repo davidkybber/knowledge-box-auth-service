@@ -61,4 +61,23 @@ temp/
 .env
 .env.development.local
 .env.test.local
-.env.production.local 
+.env.production.local
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraformrc
+terraform.rc
+crash.log
+crash.*.log
+*.tfplan
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc 
+

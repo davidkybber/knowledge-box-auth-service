@@ -14,22 +14,6 @@ variable "tags" {
   }
 }
 
-variable "container_registry_url" {
-  description = "URL of the container registry"
-  type        = string
-}
-
-variable "container_registry_username" {
-  description = "Username for the container registry"
-  type        = string
-}
-
-variable "container_registry_password" {
-  description = "Password for the container registry"
-  type        = string
-  sensitive   = true
-}
-
 variable "acr_name" {
   description = "Name of the Azure Container Registry"
   type        = string
@@ -44,6 +28,12 @@ variable "acr_sku" {
 
 variable "acr_admin_enabled" {
   description = "Enable admin user for ACR"
+  type        = bool
+  default     = true
+}
+
+variable "acr_enabled" {
+  description = "Enable or disable the ACR (to save costs when not in use)"
   type        = bool
   default     = true
 } 
