@@ -36,4 +36,9 @@ variable "acr_enabled" {
   description = "Enable or disable the ACR (to save costs when not in use)"
   type        = bool
   default     = true
+}
+
+variable "deployment_sp_object_id" {
+  description = "Object ID of the deployment service principal used by GitHub Actions"
+  type        = string
 } 

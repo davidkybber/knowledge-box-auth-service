@@ -74,6 +74,14 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = azurerm_container_app.auth_service.identity[0].principal_id
 }
 
+# Grant ACR pull access to the deployment service principal
+resource "azurerm_role_assignment" "acr_pull_deployment" {
+  count                = var.acr_enabled ? 1 : 0
+  scope                = azurerm_container_registry.acr[0].id
+  role_definition_name = "AcrPull"
+  principal_id         = var.deployment_sp_object_id
+}
+
 # Key Vault for secrets management (using free tier)
 resource "azurerm_key_vault" "kv" {
   name                = "${var.project_name}-auth-kv"
