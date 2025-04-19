@@ -1,4 +1,3 @@
-using KnowledgeBox.Auth.Models;
 using KnowledgeBox.Auth.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,4 +25,4 @@ app.MapControllers();
 app.Run();
 
 // Make Program accessible to test projects
-public partial class Program { }
+public partial class Program;

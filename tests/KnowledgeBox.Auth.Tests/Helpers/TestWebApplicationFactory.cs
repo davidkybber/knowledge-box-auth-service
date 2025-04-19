@@ -4,44 +4,43 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 
-namespace KnowledgeBox.Auth.Tests.Helpers
+namespace KnowledgeBox.Auth.Tests.Helpers;
+
+/// <summary>
+/// Factory for integration tests against the application
+/// </summary>
+public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    /// <summary>
-    /// Base class for test factories with common functionality
-    /// </summary>
-    public abstract class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>
-        where TProgram : class
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.ConfigureServices(ConfigureServices);
+        builder.ConfigureServices(ConfigureServices);
 
-            // Reduce logging noise in tests
-            builder.ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-                logging.SetMinimumLevel(LogLevel.Warning);
-            });
-        }
-
-        /// <summary>
-        /// Configure services for tests. Override in derived classes.
-        /// </summary>
-        protected virtual void ConfigureServices(IServiceCollection services)
+        // Reduce logging noise in tests
+        builder.ConfigureLogging(logging =>
         {
-            // Base implementation does nothing
-        }
-
-        /// <summary>
-        /// Creates a client with JSON accept header.
-        /// </summary>
-        public HttpClient CreateClientWithJsonAcceptHeader()
-        {
-            var client = CreateClient();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-            return client;
-        }
+            logging.ClearProviders();
+            logging.AddConsole();
+            logging.SetMinimumLevel(LogLevel.Warning);
+        });
     }
-} 
+
+    /// <summary>
+    /// Configure services for tests. Can be extended in tests if needed.
+    /// </summary>
+    protected virtual void ConfigureServices(IServiceCollection services)
+    {
+        // Default implementation does nothing
+        // You can add test-specific service configuration here
+    }
+
+    /// <summary>
+    /// Creates a client with JSON accept header.
+    /// </summary>
+    public HttpClient CreateClientWithJsonAcceptHeader()
+    {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/json"));
+        return client;
+    }
+}
