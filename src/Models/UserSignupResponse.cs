@@ -1,7 +1,8 @@
 namespace KnowledgeBox.Auth.Models;
 
-public class UserSignupResponse
+public record UserSignupResponse
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
-}
+    public required bool Success { get; init; }
+    public string? Message { get; init; }
+    public User? User { get; init; }
+} 

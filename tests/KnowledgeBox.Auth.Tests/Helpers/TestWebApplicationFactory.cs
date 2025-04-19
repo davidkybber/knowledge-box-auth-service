@@ -1,19 +1,35 @@
+using KnowledgeBox.Auth.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
+using Xunit;
 
 namespace KnowledgeBox.Auth.Tests.Helpers;
 
 /// <summary>
 /// Factory for integration tests against the application
 /// </summary>
-public class TestWebApplicationFactory : WebApplicationFactory<Program>
+public sealed class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private readonly PostgreSqlFixture _dbFixture = new();
+    
+    public async Task InitializeAsync()
+    {
+        await _dbFixture.InitializeAsync();
+    }
+
+    public new async Task DisposeAsync()
+    {
+        await _dbFixture.DisposeAsync();
+        await base.DisposeAsync();
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(ConfigureServices);
+        builder.ConfigureServices(services => ConfigureServices(services));
 
         // Reduce logging noise in tests
         builder.ConfigureLogging(logging =>
@@ -25,12 +41,28 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     }
 
     /// <summary>
-    /// Configure services for tests. Can be extended in tests if needed.
+    /// Configure services for tests
     /// </summary>
-    protected virtual void ConfigureServices(IServiceCollection services)
+    private void ConfigureServices(IServiceCollection services)
     {
-        // Default implementation does nothing
-        // You can add test-specific service configuration here
+        // Remove the existing DbContext registration
+        var descriptor = services.SingleOrDefault(
+            d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+        if (descriptor != null)
+        {
+            services.Remove(descriptor);
+        }
+
+        // Register the DbContext with the test PostgreSQL container
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(_dbFixture.ConnectionString);
+        });
+
+        // Ensure data is clean for each test
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.EnsureCreated();
     }
 
     /// <summary>
