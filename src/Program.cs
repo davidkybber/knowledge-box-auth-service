@@ -1,6 +1,4 @@
 using KnowledgeBox.Auth.Database;
-using KnowledgeBox.Auth.Models;
-using KnowledgeBox.Auth.Repositories;
 using KnowledgeBox.Auth.Repositories.UserRepository;
 using KnowledgeBox.Auth.Services;
 using Microsoft.EntityFrameworkCore;
@@ -34,9 +32,9 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
-        logger.LogInformation("Applying migrations...");
+        logger.LogInformation("Applying database migrations...");
         dbContext.Database.Migrate();
-        logger.LogInformation("Migrations applied successfully");
+        logger.LogInformation("Database migrations applied successfully");
     }
     catch (Exception ex)
     {

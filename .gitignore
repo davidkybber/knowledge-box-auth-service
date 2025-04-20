@@ -165,3 +165,34 @@ artifacts/
 ## ASP.NET Scaffolding
 ScaffoldingReadMe.txt 
 
+# .NET build artifacts
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.tmp
+*.cache
+
+# Docker volumes
+postgres-data/
+*.volume/
+
+# Local settings with secrets
+appsettings.*.local.json
+.env
+
+# Test results
+TestResults/
+coverage.json
+coverage.xml
+coverage/
+
+# IDE files
+.idea/
+*.DotSettings
+
+# MacOS files
+.DS_Store 
+
