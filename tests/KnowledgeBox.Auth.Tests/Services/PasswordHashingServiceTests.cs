@@ -5,12 +5,7 @@ namespace KnowledgeBox.Auth.Tests.Services;
 
 public class PasswordHashingServiceTests
 {
-    private readonly IPasswordHashingService _passwordHashingService;
-
-    public PasswordHashingServiceTests()
-    {
-        _passwordHashingService = new PasswordHashingService();
-    }
+    private readonly IPasswordHashingService _passwordHashingService = new PasswordHashingService();
 
     [Fact]
     public void HashPassword_ShouldGenerateHash_ThatIsNotEqualToOriginalPassword()

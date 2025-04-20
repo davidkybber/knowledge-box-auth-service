@@ -11,19 +11,11 @@ using Xunit.Abstractions;
 
 namespace KnowledgeBox.Auth.Tests.Controllers
 {
-    public class AuthControllerTests : IClassFixture<TestWebApplicationFactory>
+    public class AuthControllerTests(TestWebApplicationFactory factory, ITestOutputHelper output)
+        : IClassFixture<TestWebApplicationFactory>
     {
-        private readonly TestWebApplicationFactory _factory;
-        private readonly HttpClient _client;
-        private readonly ITestOutputHelper _output;
+        private readonly HttpClient _client = factory.CreateClientWithJsonAcceptHeader();
         private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
-
-        public AuthControllerTests(TestWebApplicationFactory factory, ITestOutputHelper output)
-        {
-            _factory = factory;
-            _client = factory.CreateClientWithJsonAcceptHeader();
-            _output = output;
-        }
 
         [Fact]
         public async Task Signup_WithValidRequest_ReturnsOk()
@@ -39,10 +31,10 @@ namespace KnowledgeBox.Auth.Tests.Controllers
             // Act
             var response = await _client.PostAsJsonAsync("/Auth/signup", signupRequest);
             
-            _output.WriteLine($"Response status code: {response.StatusCode}");
+            output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
-            _output.WriteLine($"Response content: {responseContent}");
+            output.WriteLine($"Response content: {responseContent}");
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -70,10 +62,10 @@ namespace KnowledgeBox.Auth.Tests.Controllers
 
             // Act
             var response = await _client.PostAsJsonAsync("/Auth/signup", signupRequest);
-            _output.WriteLine($"Response status code: {response.StatusCode}");
+            output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
-            _output.WriteLine($"Response content: {responseContent}");
+            output.WriteLine($"Response content: {responseContent}");
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -92,10 +84,10 @@ namespace KnowledgeBox.Auth.Tests.Controllers
 
             // Act
             var response = await _client.PostAsJsonAsync("/Auth/signup", signupRequest);
-            _output.WriteLine($"Response status code: {response.StatusCode}");
+            output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
-            _output.WriteLine($"Response content: {responseContent}");
+            output.WriteLine($"Response content: {responseContent}");
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -114,16 +106,16 @@ namespace KnowledgeBox.Auth.Tests.Controllers
 
             // Act
             var response = await _client.PostAsJsonAsync("/Auth/signup", signupRequest);
-            _output.WriteLine($"Response status code: {response.StatusCode}");
+            output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
-            _output.WriteLine($"Response content: {responseContent}");
+            output.WriteLine($"Response content: {responseContent}");
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             
             // Verify the user exists in the database
-            using var scope = _factory.Services.CreateScope();
+            using var scope = factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var user = await dbContext.Users.FirstOrDefaultAsync(u => 
                 u.Username.ToLower() == signupRequest.Username.ToLower());
@@ -157,10 +149,10 @@ namespace KnowledgeBox.Auth.Tests.Controllers
             };
             
             var response = await _client.PostAsJsonAsync("/Auth/login", loginRequest);
-            _output.WriteLine($"Response status code: {response.StatusCode}");
+            output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
-            _output.WriteLine($"Response content: {responseContent}");
+            output.WriteLine($"Response content: {responseContent}");
             
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -187,10 +179,10 @@ namespace KnowledgeBox.Auth.Tests.Controllers
             
             // Act
             var response = await _client.PostAsJsonAsync("/Auth/login", loginRequest);
-            _output.WriteLine($"Response status code: {response.StatusCode}");
+            output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
-            _output.WriteLine($"Response content: {responseContent}");
+            output.WriteLine($"Response content: {responseContent}");
             
             // Assert
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);

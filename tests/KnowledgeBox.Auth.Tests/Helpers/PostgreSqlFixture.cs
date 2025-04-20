@@ -1,5 +1,3 @@
-using System.Data;
-using DotNet.Testcontainers.Builders;
 using Npgsql;
 using Testcontainers.PostgreSql;
 using Xunit;

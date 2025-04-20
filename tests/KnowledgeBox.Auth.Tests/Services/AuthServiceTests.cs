@@ -13,6 +13,7 @@ public class AuthServiceTests
 {
     private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly Mock<IPasswordHashingService> _mockPasswordHashingService;
+    private readonly Mock<IJwtService> _mockJwtService;
     private readonly Mock<ILogger<AuthService>> _mockLogger;
     private readonly AuthService _authService;
 
@@ -20,12 +21,14 @@ public class AuthServiceTests
     {
         _mockUserRepository = new Mock<IUserRepository>();
         _mockPasswordHashingService = new Mock<IPasswordHashingService>();
+        _mockJwtService = new Mock<IJwtService>();
         _mockLogger = new Mock<ILogger<AuthService>>();
 
         _authService = new AuthService(
             _mockLogger.Object,
             _mockUserRepository.Object,
-            _mockPasswordHashingService.Object);
+            _mockPasswordHashingService.Object,
+            _mockJwtService.Object);
     }
 
     [Fact]
@@ -116,12 +119,13 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task AuthenticateAsync_WithValidCredentials_ShouldReturnUser()
+    public async Task AuthenticateAsync_WithValidCredentials_ShouldReturnLoginResponse()
     {
         // Arrange
         var username = "validuser";
         var password = "ValidPassword123!";
         var hashedPassword = "hashed_password";
+        var token = "jwt_token";
         
         var user = new User
         {
@@ -136,15 +140,19 @@ public class AuthServiceTests
             .ReturnsAsync(user);
         _mockPasswordHashingService.Setup(s => s.VerifyPassword(password, hashedPassword))
             .Returns(true);
+        _mockJwtService.Setup(s => s.GenerateToken(user))
+            .Returns(token);
 
         // Act
         var result = await _authService.AuthenticateAsync(username, password);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(user.Id, result.Id);
-        Assert.Equal(user.Username, result.Username);
-        Assert.NotNull(result.LastLoginAt);
+        Assert.True(result.Success);
+        Assert.Equal(token, result.Token);
+        Assert.NotNull(result.User);
+        Assert.Equal(user.Id, result.User.Id);
+        Assert.Equal(user.Username, result.User.Username);
         
         _mockUserRepository.Verify(r => r.UpdateAsync(It.IsAny<User>()), Times.Once);
         _mockUserRepository.Verify(r => r.SaveChangesAsync(), Times.Once);

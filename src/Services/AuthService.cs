@@ -3,19 +3,33 @@ using KnowledgeBox.Auth.Repositories.UserRepository;
 
 namespace KnowledgeBox.Auth.Services;
 
-public class AuthService(
-    ILogger<AuthService> logger,
-    IUserRepository userRepository,
-    IPasswordHashingService passwordHashingService)
+public class AuthService
 {
+    private readonly ILogger<AuthService> _logger;
+    private readonly IUserRepository _userRepository;
+    private readonly IPasswordHashingService _passwordHashingService;
+    private readonly IJwtService _jwtService;
+
+    public AuthService(
+        ILogger<AuthService> logger,
+        IUserRepository userRepository,
+        IPasswordHashingService passwordHashingService,
+        IJwtService jwtService)
+    {
+        _logger = logger;
+        _userRepository = userRepository;
+        _passwordHashingService = passwordHashingService;
+        _jwtService = jwtService;
+    }
+
     public async Task<User> SignupUserAsync(UserSignupRequest request)
     {
-        if (await userRepository.UsernameExistsAsync(request.Username))
+        if (await _userRepository.UsernameExistsAsync(request.Username))
         {
             throw new InvalidOperationException("Username is already taken");
         }
 
-        if (await userRepository.EmailExistsAsync(request.Email))
+        if (await _userRepository.EmailExistsAsync(request.Email))
         {
             throw new InvalidOperationException("Email is already registered");
         }
@@ -25,35 +39,43 @@ public class AuthService(
             Id = Guid.NewGuid(),
             Username = request.Username,
             Email = request.Email,
-            PasswordHash = passwordHashingService.HashPassword(request.Password),
+            PasswordHash = _passwordHashingService.HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
             CreatedAt = DateTimeOffset.UtcNow
         };
 
-        await userRepository.AddAsync(user);
-        await userRepository.SaveChangesAsync();
+        await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
 
-        logger.LogInformation("New user created: {Username}", user.Username);
+        _logger.LogInformation("New user created: {Username}", user.Username);
 
         return user;
     }
 
-    public async Task<User> AuthenticateAsync(string username, string password)
+    public async Task<LoginResponse> AuthenticateAsync(string username, string password)
     {
-        var user = await userRepository.GetByUsernameAsync(username);
+        var user = await _userRepository.GetByUsernameAsync(username);
         
-        if (user == null || !passwordHashingService.VerifyPassword(password, user.PasswordHash))
+        if (user == null || !_passwordHashingService.VerifyPassword(password, user.PasswordHash))
         {
             throw new InvalidOperationException("Invalid username or password");
         }
 
         user.LastLoginAt = DateTimeOffset.UtcNow;
-        await userRepository.UpdateAsync(user);
-        await userRepository.SaveChangesAsync();
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
 
-        logger.LogInformation("User authenticated: {Username}", user.Username);
+        var token = _jwtService.GenerateToken(user);
 
-        return user;
+        _logger.LogInformation("User authenticated: {Username}", user.Username);
+
+        return new LoginResponse
+        {
+            Success = true,
+            Message = "Authentication successful",
+            Token = token,
+            User = UserDto.FromUser(user)
+        };
     }
 }
