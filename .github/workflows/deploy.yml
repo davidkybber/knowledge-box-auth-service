@@ -63,4 +63,5 @@ jobs:
           containerAppName: ${{ env.CONTAINER_APP_NAME }}
           imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:latest
           acrUsername: ${{ steps.acr-creds.outputs.username }}
-          acrPassword: ${{ steps.acr-creds.outputs.password }} 
+          acrPassword: ${{ steps.acr-creds.outputs.password }}
+          # All secrets are managed by Terraform and accessed by the app via its managed identity 

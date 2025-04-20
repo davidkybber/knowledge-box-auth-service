@@ -11,25 +11,18 @@ public interface IJwtService
     string GenerateToken(User user);
 }
 
-public class JwtService : IJwtService
+public class JwtService(IConfiguration configuration) : IJwtService
 {
-    private readonly IConfiguration _configuration;
-
-    public JwtService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
     public string GenerateToken(User user)
     {
-        var jwtKey = _configuration["Jwt:Key"] ?? 
+        var jwtKey = configuration["Jwt:Key"] ?? 
             throw new InvalidOperationException("JWT Key is not configured");
-        var jwtIssuer = _configuration["Jwt:Issuer"] ?? 
+        var jwtIssuer = configuration["Jwt:Issuer"] ?? 
             throw new InvalidOperationException("JWT Issuer is not configured");
-        var jwtAudience = _configuration["Jwt:Audience"] ?? 
+        var jwtAudience = configuration["Jwt:Audience"] ?? 
             throw new InvalidOperationException("JWT Audience is not configured");
         
-        if (!int.TryParse(_configuration["Jwt:DurationInMinutes"], out int jwtDurationInMinutes))
+        if (!int.TryParse(configuration["Jwt:DurationInMinutes"], out int jwtDurationInMinutes))
         {
             jwtDurationInMinutes = 60; // Default to 60 minutes
         }

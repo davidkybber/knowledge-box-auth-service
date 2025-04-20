@@ -8,17 +8,8 @@ namespace KnowledgeBox.Auth.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(AuthService authService, ILogger<AuthController> logger) : ControllerBase
 {
-    private readonly AuthService _authService;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(AuthService authService, ILogger<AuthController> logger)
-    {
-        _authService = authService;
-        _logger = logger;
-    }
-
     [HttpPost("signup")]
     [ProducesResponseType(typeof(UserSignupResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserSignupResponse), StatusCodes.Status400BadRequest)]
@@ -26,7 +17,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var user = await _authService.SignupUserAsync(request);
+            var user = await authService.SignupUserAsync(request);
             var response = new UserSignupResponse
             {
                 Success = true,
@@ -46,7 +37,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating user");
+            logger.LogError(ex, "Error creating user");
             var response = new UserSignupResponse
             {
                 Success = false,
@@ -63,7 +54,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var response = await _authService.AuthenticateAsync(request.Username, request.Password);
+            var response = await authService.AuthenticateAsync(request.Username, request.Password);
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -76,7 +67,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error authenticating user");
+            logger.LogError(ex, "Error authenticating user");
             return StatusCode(500, new LoginResponse
             {
                 Success = false,

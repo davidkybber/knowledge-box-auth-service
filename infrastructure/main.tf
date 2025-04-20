@@ -22,6 +22,20 @@ resource "azurerm_container_app_environment" "env" {
   tags                = var.tags
 }
 
+# Generate secure random JWT key
+resource "random_password" "jwt_key" {
+  length           = 64
+  special          = true
+  override_special = "!@#$%&*()-_=+[]{}<>:?"
+}
+
+# Generate secure random PostgreSQL password
+resource "random_password" "postgres_password" {
+  length           = 32
+  special          = true
+  override_special = "!@#$%&*()-_=+[]{}<>:?"
+}
+
 # Container App for Auth Service
 resource "azurerm_container_app" "auth_service" {
   name                         = "${var.project_name}-auth-service"
@@ -51,13 +65,48 @@ resource "azurerm_container_app" "auth_service" {
         value = "8080"
       }
 
-      # Add more environment variables as needed
+      # JWT Authentication settings
+      env {
+        name  = "Jwt__Key"
+        secret_name = "jwt-key"
+      }
+
+      env {
+        name  = "Jwt__Issuer"
+        value = var.jwt_issuer
+      }
+
+      env {
+        name  = "Jwt__Audience"
+        value = var.jwt_audience
+      }
+
+      env {
+        name  = "Jwt__DurationInMinutes"
+        value = var.jwt_duration_minutes
+      }
+
+      # Database connection string
+      env {
+        name  = "ConnectionStrings__DefaultConnection"
+        secret_name = "db-connection-string"
+      }
     }
   }
 
   secret {
     name  = "acr-password"
     value = var.acr_admin_enabled ? azurerm_container_registry.acr[0].admin_password : null
+  }
+
+  secret {
+    name  = "jwt-key"
+    value = random_password.jwt_key.result
+  }
+
+  secret {
+    name  = "db-connection-string"
+    value = "Host=${var.postgres_host};Port=${var.postgres_port};Database=${var.postgres_db};Username=${var.postgres_user};Password=${random_password.postgres_password.result};Pooling=true;"
   }
 
   registry {
@@ -126,4 +175,20 @@ resource "azurerm_key_vault_access_policy" "container_app_access" {
   secret_permissions = [
     "Get", "List"
   ]
+}
+
+# Store JWT key in Key Vault
+resource "azurerm_key_vault_secret" "jwt_key" {
+  name         = "jwt-key"
+  value        = random_password.jwt_key.result
+  key_vault_id = azurerm_key_vault.kv.id
+  depends_on   = [azurerm_key_vault_access_policy.kv_access]
+}
+
+# Store DB connection string in Key Vault
+resource "azurerm_key_vault_secret" "db_connection_string" {
+  name         = "db-connection-string"
+  value        = "Host=${var.postgres_host};Port=${var.postgres_port};Database=${var.postgres_db};Username=${var.postgres_user};Password=${random_password.postgres_password.result};Pooling=true;"
+  key_vault_id = azurerm_key_vault.kv.id
+  depends_on   = [azurerm_key_vault_access_policy.kv_access]
 } 

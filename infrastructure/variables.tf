@@ -41,4 +41,48 @@ variable "acr_enabled" {
 variable "deployment_sp_object_id" {
   description = "Object ID of the deployment service principal used by GitHub Actions"
   type        = string
+}
+
+# JWT Authentication Configuration
+variable "jwt_issuer" {
+  description = "JWT issuer claim"
+  type        = string
+  default     = "KnowledgeBoxAuthService"
+}
+
+variable "jwt_audience" {
+  description = "JWT audience claim"
+  type        = string
+  default     = "KnowledgeBoxClients"
+}
+
+variable "jwt_duration_minutes" {
+  description = "JWT token expiration time in minutes"
+  type        = number
+  default     = 60
+}
+
+# PostgreSQL Configuration
+variable "postgres_host" {
+  description = "PostgreSQL server hostname"
+  type        = string
+  default     = "knowledge-box-postgres"  # Update with your actual host
+}
+
+variable "postgres_port" {
+  description = "PostgreSQL server port"
+  type        = number
+  default     = 5432
+}
+
+variable "postgres_db" {
+  description = "PostgreSQL database name"
+  type        = string
+  default     = "knowledgebox"
+}
+
+variable "postgres_user" {
+  description = "PostgreSQL username"
+  type        = string
+  default     = "postgres"  # It's recommended to change this in tfvars
 } 
