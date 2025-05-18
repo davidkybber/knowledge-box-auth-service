@@ -57,7 +57,7 @@ namespace KnowledgeBox.Auth.Tests.Controllers
                 new AuthenticationHeaderValue("Bearer", token);
 
             // Act
-            var response = await authorizedClient.GetAsync("/Auth/me");
+            var response = await authorizedClient.GetAsync("/me");
             output.WriteLine($"Response status code: {response.StatusCode}");
             
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -82,7 +82,7 @@ namespace KnowledgeBox.Auth.Tests.Controllers
         public async Task MeEndpoint_WithoutToken_ReturnsUnauthorized()
         {
             // Act
-            var response = await _client.GetAsync("/Auth/me");
+            var response = await _client.GetAsync("/me");
             output.WriteLine($"Response status code: {response.StatusCode}");
 
             // Assert
@@ -100,7 +100,7 @@ namespace KnowledgeBox.Auth.Tests.Controllers
                 new AuthenticationHeaderValue("Bearer", invalidToken);
 
             // Act
-            var response = await authorizedClient.GetAsync("/Auth/me");
+            var response = await authorizedClient.GetAsync("/me");
             output.WriteLine($"Response status code: {response.StatusCode}");
 
             // Assert

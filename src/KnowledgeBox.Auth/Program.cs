@@ -79,6 +79,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 

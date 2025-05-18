@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeBox.Auth", "KnowledgeBox.Auth\KnowledgeBox.Auth.csproj", "{85E8FADB-F605-40CD-99F9-3CCD8B31F1C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeBox.Auth.Tests", "KnowledgeBox.Auth.Tests\KnowledgeBox.Auth.Tests.csproj", "{B4D12F15-32D6-4F0D-BF7F-4A3B898E82FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85E8FADB-F605-40CD-99F9-3CCD8B31F1C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85E8FADB-F605-40CD-99F9-3CCD8B31F1C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85E8FADB-F605-40CD-99F9-3CCD8B31F1C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85E8FADB-F605-40CD-99F9-3CCD8B31F1C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4D12F15-32D6-4F0D-BF7F-4A3B898E82FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4D12F15-32D6-4F0D-BF7F-4A3B898E82FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4D12F15-32D6-4F0D-BF7F-4A3B898E82FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4D12F15-32D6-4F0D-BF7F-4A3B898E82FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -75,19 +75,4 @@ public class AuthController(AuthService authService, ILogger<AuthController> log
             });
         }
     }
-    
-    [HttpGet("me")]
-    [Authorize]
-    public IActionResult GetCurrentUser()
-    {
-        // Get the username from the claims rather than User.Identity.Name
-        var username = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
-        
-        // In a real application, you would retrieve the user from the database
-        return Ok(new 
-        { 
-            Message = $"You are authenticated as {username}",
-            Claims = User.Claims.Select(c => new { c.Type, c.Value })
-        });
-    }
 }

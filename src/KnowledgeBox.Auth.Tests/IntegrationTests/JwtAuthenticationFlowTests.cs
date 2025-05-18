@@ -85,7 +85,7 @@ namespace KnowledgeBox.Auth.Tests.IntegrationTests
             var authorizedClient = factory.CreateClientWithJsonAcceptHeader();
             authorizedClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             
-            var meResponse = await authorizedClient.GetAsync("/Auth/me");
+            var meResponse = await authorizedClient.GetAsync("/me");
             output.WriteLine($"Me endpoint response: {meResponse.StatusCode}");
             
             Assert.Equal(HttpStatusCode.OK, meResponse.StatusCode);
@@ -98,7 +98,7 @@ namespace KnowledgeBox.Auth.Tests.IntegrationTests
             Assert.True(meResult!.ContainsKey("message"));
             
             // Step 5: Try accessing protected endpoint without token
-            var unauthorizedResponse = await _client.GetAsync("/Auth/me");
+            var unauthorizedResponse = await _client.GetAsync("/me");
             output.WriteLine($"Unauthorized response: {unauthorizedResponse.StatusCode}");
             
             Assert.Equal(HttpStatusCode.Unauthorized, unauthorizedResponse.StatusCode);
