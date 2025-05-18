@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using KnowledgeBox.Auth.Models;
 using KnowledgeBox.Auth.Tests.Helpers;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\KnowledgeBox.Auth.csproj" />
+    <ProjectReference Include="..\KnowledgeBox.Auth\KnowledgeBox.Auth.csproj" />
   </ItemGroup>
 
 </Project> 
