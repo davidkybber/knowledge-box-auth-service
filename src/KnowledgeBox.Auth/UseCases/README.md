@@ -2,6 +2,17 @@
 
 This project uses the MediatR library to implement the Mediator pattern, which helps to decouple controllers from services and provides a clean way to implement the CQRS (Command Query Responsibility Segregation) pattern.
 
+## Service Replacement with MediatR
+
+The previous `AuthService` has been replaced with MediatR handlers. This removes the coupling between controllers and services, allowing for:
+
+- Better separation of concerns
+- More focused and testable components
+- Easier extensibility with cross-cutting concerns
+- Cleaner, more maintainable code
+
+Instead of injecting `AuthService` into controllers, controllers now depend on `IMediator` and create/send appropriate commands or queries.
+
 ## Key Benefits
 
 1. **Decoupling**: Controllers no longer directly depend on services, reducing tight coupling between layers

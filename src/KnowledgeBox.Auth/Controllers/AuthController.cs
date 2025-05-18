@@ -19,8 +19,8 @@ public class AuthController(IMediator mediator, ILogger<AuthController> logger) 
             request.Username,
             request.Email,
             request.Password,
-            request.FirstName,
-            request.LastName);
+            request.FirstName ?? string.Empty,
+            request.LastName ?? string.Empty);
             
         var response = await mediator.Send(command);
         

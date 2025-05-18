@@ -46,7 +46,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Add services
 builder.Services.AddScoped<IPasswordHashingService, PasswordHashingService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<AuthService>();
 
 // Add services to the container.
 builder.Services.AddControllers();
