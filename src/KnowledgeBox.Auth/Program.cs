@@ -1,9 +1,11 @@
 using System.Text;
 using KnowledgeBox.Auth.Database;
+using KnowledgeBox.Auth.Infrastructure.MediatR;
 using KnowledgeBox.Auth.Models;
 using KnowledgeBox.Auth.Repositories;
 using KnowledgeBox.Auth.Repositories.UserRepository;
 using KnowledgeBox.Auth.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -79,7 +81,13 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
+// Register MediatR and scan for handlers in this assembly
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssemblyContaining<Program>();
+    // Add pipeline behaviors
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+});
 
 var app = builder.Build();
 

@@ -1,4 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
+using KnowledgeBox.Auth.Features.User.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,18 +8,15 @@ namespace KnowledgeBox.Auth.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MeController: ControllerBase
+public class MeController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
     [Authorize]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var username = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
+        var query = new GetCurrentUserQuery(User);
+        var response = await mediator.Send(query);
         
-        return Ok(new 
-        { 
-            Message = $"You are authenticated as {username}",
-            Claims = User.Claims.Select(c => new { c.Type, c.Value })
-        });
+        return Ok(response);
     }
 }

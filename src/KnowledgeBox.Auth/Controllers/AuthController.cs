@@ -1,50 +1,35 @@
+using KnowledgeBox.Auth.Features.Authentication.Commands;
+using KnowledgeBox.Auth.Features.Authentication.Queries;
 using KnowledgeBox.Auth.Models;
-using KnowledgeBox.Auth.Services;
-using Microsoft.AspNetCore.Authorization;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace KnowledgeBox.Auth.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthController(AuthService authService, ILogger<AuthController> logger) : ControllerBase
+public class AuthController(IMediator mediator, ILogger<AuthController> logger) : ControllerBase
 {
     [HttpPost("signup")]
     [ProducesResponseType(typeof(UserSignupResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserSignupResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Signup(UserSignupRequest request)
     {
-        try
+        var command = new SignupCommand(
+            request.Username,
+            request.Email,
+            request.Password,
+            request.FirstName,
+            request.LastName);
+            
+        var response = await mediator.Send(command);
+        
+        if (!response.Success)
         {
-            var user = await authService.SignupUserAsync(request);
-            var response = new UserSignupResponse
-            {
-                Success = true,
-                Message = "User created successfully",
-                User = UserDto.FromUser(user)
-            };
-            return Ok(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            var response = new UserSignupResponse
-            {
-                Success = false,
-                Message = ex.Message
-            };
             return BadRequest(response);
         }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error creating user");
-            var response = new UserSignupResponse
-            {
-                Success = false,
-                Message = "An error occurred while creating the user"
-            };
-            return StatusCode(500, response);
-        }
+        
+        return Ok(response);
     }
 
     [HttpPost("login")]
@@ -52,27 +37,14 @@ public class AuthController(AuthService authService, ILogger<AuthController> log
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        try
+        var query = new LoginQuery(request.Username, request.Password);
+        var response = await mediator.Send(query);
+        
+        if (!response.Success)
         {
-            var response = await authService.AuthenticateAsync(request.Username, request.Password);
-            return Ok(response);
+            return Unauthorized(response);
         }
-        catch (InvalidOperationException ex)
-        {
-            return Unauthorized(new LoginResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error authenticating user");
-            return StatusCode(500, new LoginResponse
-            {
-                Success = false,
-                Message = "An error occurred during authentication"
-            });
-        }
+        
+        return Ok(response);
     }
 }
