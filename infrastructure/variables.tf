@@ -85,4 +85,16 @@ variable "postgres_user" {
   description = "PostgreSQL username"
   type        = string
   default     = "postgres"  # It's recommended to change this in tfvars
+}
+
+variable "postgres_sku" {
+  description = "The SKU name for the PostgreSQL Flexible Server"
+  type        = string
+  default     = "B_Standard_B1ms"  # Cheapest burstable tier
+}
+
+variable "postgres_storage_mb" {
+  description = "The storage size for the PostgreSQL Flexible Server in MB"
+  type        = number
+  default     = 32768  # 32GB, the minimum allowed size
 } 

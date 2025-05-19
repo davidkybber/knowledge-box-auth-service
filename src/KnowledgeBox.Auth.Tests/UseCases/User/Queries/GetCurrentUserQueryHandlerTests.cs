@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using KnowledgeBox.Auth.Features.User.Queries;
+using KnowledgeBox.Auth.UseCases.User.Queries;
 using Xunit;
 
 namespace KnowledgeBox.Auth.Tests.UseCases.User.Queries;

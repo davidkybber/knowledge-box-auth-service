@@ -36,6 +36,38 @@ resource "random_password" "postgres_password" {
   override_special = "!@#$%&*()-_=+[]{}<>:?"
 }
 
+# PostgreSQL Flexible Server
+resource "azurerm_postgresql_flexible_server" "postgres" {
+  name                   = "${var.project_name}-postgres"
+  resource_group_name    = data.azurerm_resource_group.rg.name
+  location               = data.azurerm_resource_group.rg.location
+  version                = "16"
+  administrator_login    = var.postgres_user
+  administrator_password = random_password.postgres_password.result
+  zone                   = "1"
+  storage_mb             = var.postgres_storage_mb
+  sku_name               = var.postgres_sku
+  backup_retention_days  = 7
+  
+  tags                   = var.tags
+}
+
+# PostgreSQL Database
+resource "azurerm_postgresql_flexible_server_database" "db" {
+  name      = var.postgres_db
+  server_id = azurerm_postgresql_flexible_server.postgres.id
+  charset   = "UTF8"
+  collation = "en_US.utf8"
+}
+
+# PostgreSQL Firewall Rule to allow Azure services
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure" {
+  name             = "AllowAzureServices"
+  server_id        = azurerm_postgresql_flexible_server.postgres.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
+
 # Container App for Auth Service
 resource "azurerm_container_app" "auth_service" {
   name                         = "${var.project_name}-auth-service"
@@ -106,7 +138,7 @@ resource "azurerm_container_app" "auth_service" {
 
   secret {
     name  = "db-connection-string"
-    value = "Host=${var.postgres_host};Port=${var.postgres_port};Database=${var.postgres_db};Username=${var.postgres_user};Password=${random_password.postgres_password.result};Pooling=true;"
+    value = "Host=${azurerm_postgresql_flexible_server.postgres.fqdn};Port=5432;Database=${var.postgres_db};Username=${var.postgres_user};Password=${random_password.postgres_password.result};Pooling=true;Ssl Mode=Require;"
   }
 
   registry {
@@ -188,7 +220,7 @@ resource "azurerm_key_vault_secret" "jwt_key" {
 # Store DB connection string in Key Vault
 resource "azurerm_key_vault_secret" "db_connection_string" {
   name         = "db-connection-string"
-  value        = "Host=${var.postgres_host};Port=${var.postgres_port};Database=${var.postgres_db};Username=${var.postgres_user};Password=${random_password.postgres_password.result};Pooling=true;"
+  value        = "Host=${azurerm_postgresql_flexible_server.postgres.fqdn};Port=5432;Database=${var.postgres_db};Username=${var.postgres_user};Password=${random_password.postgres_password.result};Pooling=true;Ssl Mode=Require;"
   key_vault_id = azurerm_key_vault.kv.id
   depends_on   = [azurerm_key_vault_access_policy.kv_access]
 } 

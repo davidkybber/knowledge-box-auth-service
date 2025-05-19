@@ -3,45 +3,33 @@ using KnowledgeBox.Auth.Repositories.UserRepository;
 using KnowledgeBox.Auth.Services;
 using MediatR;
 
-namespace KnowledgeBox.Auth.Features.Authentication.Queries;
+namespace KnowledgeBox.Auth.UseCases.Authentication.Queries;
 
-public class LoginQueryHandler : IRequestHandler<LoginQuery, LoginResponse>
+public class LoginQueryHandler(
+    ILogger<LoginQueryHandler> logger,
+    IUserRepository userRepository,
+    IPasswordHashingService passwordHashingService,
+    IJwtService jwtService)
+    : IRequestHandler<LoginQuery, LoginResponse>
 {
-    private readonly ILogger<LoginQueryHandler> _logger;
-    private readonly IUserRepository _userRepository;
-    private readonly IPasswordHashingService _passwordHashingService;
-    private readonly IJwtService _jwtService;
-
-    public LoginQueryHandler(
-        ILogger<LoginQueryHandler> logger,
-        IUserRepository userRepository,
-        IPasswordHashingService passwordHashingService,
-        IJwtService jwtService)
-    {
-        _logger = logger;
-        _userRepository = userRepository;
-        _passwordHashingService = passwordHashingService;
-        _jwtService = jwtService;
-    }
-
     public async Task<LoginResponse> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var user = await _userRepository.GetByUsernameAsync(request.Username);
+            var user = await userRepository.GetByUsernameAsync(request.Username);
             
-            if (user == null || !_passwordHashingService.VerifyPassword(request.Password, user.PasswordHash))
+            if (user == null || !passwordHashingService.VerifyPassword(request.Password, user.PasswordHash))
             {
                 throw new InvalidOperationException("Invalid username or password");
             }
 
             user.LastLoginAt = DateTimeOffset.UtcNow;
-            await _userRepository.UpdateAsync(user);
-            await _userRepository.SaveChangesAsync();
+            await userRepository.UpdateAsync(user);
+            await userRepository.SaveChangesAsync();
 
-            var token = _jwtService.GenerateToken(user);
+            var token = jwtService.GenerateToken(user);
 
-            _logger.LogInformation("User authenticated: {Username}", user.Username);
+            logger.LogInformation("User authenticated: {Username}", user.Username);
 
             return new LoginResponse
             {
@@ -61,7 +49,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, LoginResponse>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error authenticating user");
+            logger.LogError(ex, "Error authenticating user");
             return new LoginResponse
             {
                 Success = false,

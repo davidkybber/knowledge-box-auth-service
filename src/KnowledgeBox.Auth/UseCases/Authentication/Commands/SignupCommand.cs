@@ -1,7 +1,7 @@
 using KnowledgeBox.Auth.Models;
 using MediatR;
 
-namespace KnowledgeBox.Auth.Features.Authentication.Commands;
+namespace KnowledgeBox.Auth.UseCases.Authentication.Commands;
 
 public record SignupCommand(
     string Username,

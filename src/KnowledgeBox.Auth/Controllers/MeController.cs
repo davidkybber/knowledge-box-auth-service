@@ -1,5 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
-using KnowledgeBox.Auth.Features.User.Queries;
+using KnowledgeBox.Auth.UseCases.User.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -24,7 +24,7 @@ public class JwtService(IConfiguration configuration) : IJwtService
         
         if (!int.TryParse(configuration["Jwt:DurationInMinutes"], out int jwtDurationInMinutes))
         {
-            jwtDurationInMinutes = 60; // Default to 60 minutes
+            jwtDurationInMinutes = 240; // Default to 4 hours
         }
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));

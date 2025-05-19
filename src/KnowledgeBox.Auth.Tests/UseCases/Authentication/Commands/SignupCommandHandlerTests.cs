@@ -1,4 +1,3 @@
-using KnowledgeBox.Auth.Features.Authentication.Commands;
 using KnowledgeBox.Auth.Models;
 using KnowledgeBox.Auth.Repositories.UserRepository;
 using KnowledgeBox.Auth.Services;
@@ -7,6 +6,7 @@ using Moq;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using KnowledgeBox.Auth.UseCases.Authentication.Commands;
 using Xunit;
 
 namespace KnowledgeBox.Auth.Tests.Features.Authentication.Commands;

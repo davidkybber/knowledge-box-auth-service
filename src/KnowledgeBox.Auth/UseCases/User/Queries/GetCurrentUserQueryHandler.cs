@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using MediatR;
 
-namespace KnowledgeBox.Auth.Features.User.Queries;
+namespace KnowledgeBox.Auth.UseCases.User.Queries;
 
 public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, CurrentUserResponse>
 {

@@ -3,7 +3,7 @@ using KnowledgeBox.Auth.Repositories.UserRepository;
 using KnowledgeBox.Auth.Services;
 using MediatR;
 
-namespace KnowledgeBox.Auth.Features.Authentication.Commands;
+namespace KnowledgeBox.Auth.UseCases.Authentication.Commands;
 
 public class SignupCommandHandler(
     ILogger<SignupCommandHandler> logger,

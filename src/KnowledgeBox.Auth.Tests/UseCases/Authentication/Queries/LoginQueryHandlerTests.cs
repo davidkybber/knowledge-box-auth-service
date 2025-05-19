@@ -1,6 +1,6 @@
-using KnowledgeBox.Auth.Features.Authentication.Queries;
 using KnowledgeBox.Auth.Repositories.UserRepository;
 using KnowledgeBox.Auth.Services;
+using KnowledgeBox.Auth.UseCases.Authentication.Queries;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;

@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using MediatR;
 
-namespace KnowledgeBox.Auth.Features.User.Queries;
+namespace KnowledgeBox.Auth.UseCases.User.Queries;
 
 public record GetCurrentUserQuery(ClaimsPrincipal User) : IRequest<CurrentUserResponse>;
 

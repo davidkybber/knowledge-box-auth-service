@@ -1,6 +1,6 @@
-using KnowledgeBox.Auth.Features.Authentication.Commands;
-using KnowledgeBox.Auth.Features.Authentication.Queries;
 using KnowledgeBox.Auth.Models;
+using KnowledgeBox.Auth.UseCases.Authentication.Commands;
+using KnowledgeBox.Auth.UseCases.Authentication.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
