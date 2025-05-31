@@ -118,6 +118,12 @@ resource "azurerm_container_app" "auth_service" {
         value = var.jwt_duration_minutes
       }
 
+      # CORS Configuration
+      env {
+        name  = "CORS_ALLOWED_ORIGINS"
+        value = "https://ashy-island-0ba215203.6.azurestaticapps.net"
+      }
+
       # Database connection string
       env {
         name  = "ConnectionStrings__DefaultConnection"

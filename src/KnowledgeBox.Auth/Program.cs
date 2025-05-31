@@ -18,6 +18,49 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        // Get CORS origins from environment variable first, then fall back to configuration
+        var corsOriginsEnv = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+        string[] allowedOrigins;
+        
+        if (!string.IsNullOrEmpty(corsOriginsEnv))
+        {
+            allowedOrigins = corsOriginsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                          .Select(origin => origin.Trim())
+                                          .ToArray();
+        }
+        else
+        {
+            allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "*" };
+        }
+        
+        var allowedMethods = builder.Configuration.GetSection("Cors:AllowedMethods").Get<string[]>() ?? new[] { "GET", "POST", "PUT", "DELETE", "OPTIONS" };
+        var allowedHeaders = builder.Configuration.GetSection("Cors:AllowedHeaders").Get<string[]>() ?? new[] { "*" };
+        var allowCredentials = builder.Configuration.GetValue<bool>("Cors:AllowCredentials");
+
+        if (allowedOrigins.Contains("*"))
+        {
+            policy.AllowAnyOrigin();
+        }
+        else
+        {
+            policy.WithOrigins(allowedOrigins);
+        }
+
+        policy.WithMethods(allowedMethods)
+              .WithHeaders(allowedHeaders);
+
+        if (allowCredentials && !allowedOrigins.Contains("*"))
+        {
+            policy.AllowCredentials();
+        }
+    });
+});
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -116,6 +159,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add CORS middleware
+app.UseCors();
 
 // Add Authentication middleware
 app.UseAuthentication();
